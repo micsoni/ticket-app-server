@@ -16,12 +16,12 @@ router.post("/user", async (req, res, next) => {
         message: "Please supply a valid email and password"
       });
     } else {
-      const createUser = await User.create(userCredentials);
-      const jwt = toJWT({ userId: createUser.id });
+      const createdUser = await User.create(userCredentials);
+      const jwt = toJWT({ userId: createdUser.id });
       res.send({
         jwt,
-        id: createUser.id,
-        username: createUser.username
+        id: createdUser.id,
+        username: createdUser.username
       });
     }
   } catch (error) {
