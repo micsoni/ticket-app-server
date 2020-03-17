@@ -14,7 +14,7 @@ router.get("/event", async (req, res, next) => {
     const showEvent = await Event.findAndCountAll({ where: {endDate:{[Op.gt]:new Date}},
       limit, offset
     });
-    res.send(showEvent.rows);
+    res.send(showEvent);
   } catch (error) {
     next(error);
   }
