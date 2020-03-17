@@ -2,11 +2,14 @@ const express = require("express");
 const Ticket = require("../ticket/model");
 const auth = require("../auth/middleware");
 const router = express.Router();
+const Comment = require("../comment/model")
+const User = require("../user/model")
+const Event = require("../event/model")
 
 router.get("/ticket/:ticketId", async (req, res, next) => {
   try {
-    const ticketFound = await Ticket.findByPk(req.params.ticketId, {
-      include: { all: true, nested: false }
+    const ticketFound = await Ticket.findByPk(req.params.ticketId,{
+      include: [{ model: Comment, include: [User] }, Event, User]
     });
     if (!ticketFound) {
       res.status(404).send("Ticket not found");
