@@ -3,7 +3,7 @@ const Ticket = require("../ticket/model");
 const Event = require("./model");
 const auth = require("../auth/middleware");
 const router = express.Router();
-
+const User = require("../user/model");
 router.get("/event", async (req, res, next) => {
   try {
     const showEvent = await Event.findAll();
@@ -16,7 +16,7 @@ router.get("/event", async (req, res, next) => {
 router.get("/event/:eventId", async (req, res, next) => {
   try {
     const eventFound = await Event.findByPk(req.params.eventId, {
-      include: [Ticket]
+      include: { model: Ticket, include: [User] }
     });
     if (!eventFound) {
       res.status(404).send("Event not found");
