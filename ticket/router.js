@@ -2,13 +2,13 @@ const express = require("express");
 const Ticket = require("../ticket/model");
 const auth = require("../auth/middleware");
 const router = express.Router();
-const Comment = require("../comment/model")
-const User = require("../user/model")
-const Event = require("../event/model")
+const Comment = require("../comment/model");
+const User = require("../user/model");
+const Event = require("../event/model");
 
 router.get("/ticket/:ticketId", async (req, res, next) => {
   try {
-    const ticketFound = await Ticket.findByPk(req.params.ticketId,{
+    const ticketFound = await Ticket.findByPk(req.params.ticketId, {
       include: [{ model: Comment, include: [User] }, Event, User]
     });
     if (!ticketFound) {
@@ -33,8 +33,14 @@ router.post("/ticket", auth, async (req, res, next) => {
 router.put("/ticket/:ticketId", auth, async (req, res, next) => {
   try {
     const ticket = await Ticket.findByPk(req.params.ticketId);
-    const updated = await ticket.update(req.body);
-    res.send(updated);
+    const userAuthorized =
+      req.user.dataValues.id === ticket.userId ? true : false;
+    if (userAuthorized) {
+      const updated = await ticket.update(req.body);
+      res.send(updated);
+    } else {
+      res.status(401).send("User not authorized");
+    }
   } catch (error) {
     next(error);
   }

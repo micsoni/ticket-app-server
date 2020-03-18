@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("./model");
+const Event = require("../event/model");
 const Ticket = require("../ticket/model");
 const bcrypt = require("bcrypt");
 const { toJWT } = require("../auth/jwt");
@@ -37,7 +38,7 @@ router.post("/user", async (req, res, next) => {
 router.get("/user/:userId", async (req, res, next) => {
   try {
     const userFound = await User.findByPk(req.params.userId, {
-      include: [Ticket]
+      include: { model: Ticket, include: [Event] }
     });
 
     if (!userFound) {
