@@ -14,7 +14,7 @@ const Ticket = db.define("ticket", {
   pictureUrl: {
     type: Sequelize.STRING,
     allowNull: true
-  }
+  },
 });
 
 //comment relation with ticket

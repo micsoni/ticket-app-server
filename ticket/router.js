@@ -6,11 +6,17 @@ const Comment = require("../comment/model");
 const User = require("../user/model");
 const Event = require("../event/model");
 
+const getTicketRisk = require("./RiskFunction");
+
 router.get("/ticket/:ticketId", async (req, res, next) => {
   try {
     const ticketFound = await Ticket.findByPk(req.params.ticketId, {
       include: [{ model: Comment, include: [User] }, Event, User]
     });
+
+    // calculate ticket risk and put it in the ticket
+    ticketFound.dataValues.risk = await getTicketRisk(ticketFound);
+
     if (!ticketFound) {
       res.status(404).send("Ticket not found");
     } else {
