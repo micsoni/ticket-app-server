@@ -19,9 +19,7 @@ router.post("/user", async (req, res, next) => {
       !userCredentials.password ||
       !userCredentials.username
     ) {
-      res.status(400).send({
-        message: "Please supply a valid email and password"
-      });
+      res.status(400).send({message:"Please supply a valid email and password"});
     } else {
       const createdUser = await User.create(userCredentials);
       const jwt = toJWT({ userId: createdUser.id });
@@ -43,7 +41,7 @@ router.get("/user/:userId", async (req, res, next) => {
     });
 
     if (!userFound) {
-      res.status(404).send("User not found");
+      res.status(404).send({message:"User not found"});
     } else {
       res.send(userFound);
     }

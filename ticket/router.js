@@ -19,7 +19,7 @@ router.get("/ticket/:ticketId", async (req, res, next) => {
     ticketFound.dataValues.risk = await getTicketRisk(ticketFound);
 
     if (!ticketFound) {
-      res.status(404).send("Ticket not found");
+      res.status(404).send({message:"Ticket not found"});
     } else {
       res.send(ticketFound);
     }
@@ -76,7 +76,7 @@ router.put("/ticket/:ticketId", auth, async (req, res, next) => {
       const updated = await ticket.update(req.body);
       res.send(updated);
     } else {
-      res.status(401).send("User not authorized");
+      res.status(401).send({message:"User not authorized"});
     }
   } catch (error) {
     next(error);
@@ -87,7 +87,7 @@ router.delete("/ticket/:ticketId", auth, async (req, res, next) => {
   try {
     const number = await Ticket.destroy({ where: { id: req.params.ticketId } });
     if (number === 0) {
-      res.status(404).send("No ticket found");
+      res.status(404).send({message:"No ticket found"});
     } else {
       res.status(202).json(number);
     }

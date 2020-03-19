@@ -36,7 +36,7 @@ router.get("/event/:eventId", async (req, res, next) => {
       include: { model: Ticket, include: [User] }
     });
     if (!eventFound) {
-      res.status(404).send("Event not found");
+      res.status(404).send({message:"Event not found"});
     } else {
       // calculate ticket risk for all tickets of an event and put it in each ticket
       if (eventFound.tickets.length === 0) {
