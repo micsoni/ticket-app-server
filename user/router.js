@@ -1,9 +1,10 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const User = require("./model");
 const Event = require("../event/model");
 const Ticket = require("../ticket/model");
-const bcrypt = require("bcrypt");
 const { toJWT } = require("../auth/jwt");
+
 const router = express.Router();
 
 router.post("/user", async (req, res, next) => {

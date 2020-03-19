@@ -93,7 +93,7 @@ async function getTicketRisk(ticket) {
   if (risk > 95) {
     risk = 95;
   }
-  return risk;
+  return Math.round(risk);
 }
 
 module.exports = getTicketRisk;

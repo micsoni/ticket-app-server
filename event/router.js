@@ -1,22 +1,30 @@
 const express = require("express");
+const paginate = require("express-paginate");
+const { Op } = require("sequelize");
 const Ticket = require("../ticket/model");
 const Event = require("./model");
 const auth = require("../auth/middleware");
-const router = express.Router();
 const User = require("../user/model");
-const { Op } = require("sequelize");
 const getTicketRisk = require("../ticket/RiskFunction");
 
+const router = express.Router();
+
 router.get("/event", async (req, res, next) => {
-  const limit = Math.min(req.query.limit || 9, 500);
+  const limit = Math.min(req.query.limit || 9, 50);
   const offset = req.query.offset || 0;
   try {
-    const showEvent = await Event.findAndCountAll({
+    const allEvents = await Event.findAndCountAll({
       where: { endDate: { [Op.gt]: new Date() } },
       limit,
       offset
     });
-    res.send(showEvent);
+    allEvents.pageCount = Math.ceil(allEvents.count / limit);
+    allEvents.pages = paginate.getArrayPages(req)(
+      9,
+      allEvents.pageCount,
+      req.query.page
+    );
+    res.send(allEvents);
   } catch (error) {
     next(error);
   }
@@ -52,6 +60,17 @@ router.post("/event", auth, async (req, res, next) => {
   try {
     const postEvent = await Event.create(req.body);
     res.send(postEvent);
+  } catch (error) {
+    next(error);
+  }
+});
+
+//added this router so I can update events (it is not used in the frontend)
+router.put("/event/:eventId", async (req, res, next) => {
+  try {
+    const event = await Event.findByPk(req.params.eventId);
+    const updated = await event.update(req.body);
+    res.send(updated);
   } catch (error) {
     next(error);
   }

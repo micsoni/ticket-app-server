@@ -1,12 +1,12 @@
 const express = require("express");
 const Ticket = require("../ticket/model");
 const auth = require("../auth/middleware");
-const router = express.Router();
 const Comment = require("../comment/model");
 const User = require("../user/model");
 const Event = require("../event/model");
-
 const getTicketRisk = require("./RiskFunction");
+
+const router = express.Router();
 
 router.get("/ticket/:ticketId", async (req, res, next) => {
   try {

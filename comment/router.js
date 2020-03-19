@@ -1,7 +1,8 @@
 const express = require("express");
 const Comment = require("../comment/model");
-const router = express.Router();
 const auth = require("../auth/middleware");
+
+const router = express.Router();
 
 router.post("/ticket/:ticketId/comment", auth, async (req, res, next) => {
   try {
