@@ -36,7 +36,7 @@ router.get("/event/:eventId", async (req, res, next) => {
       include: { model: Ticket, include: [User] }
     });
     if (!eventFound) {
-      res.status(404).send({message:"Event not found"});
+      res.status(404).send({ message: "Event not found" });
     } else {
       // calculate ticket risk for all tickets of an event and put it in each ticket
       if (eventFound.tickets.length === 0) {
@@ -58,8 +58,18 @@ router.get("/event/:eventId", async (req, res, next) => {
 
 router.post("/event", auth, async (req, res, next) => {
   try {
-    const postEvent = await Event.create(req.body);
-    res.send(postEvent);
+    if (!req.body.name || !req.body.description || !req.body.pictureUrl) {
+      res.status(400).send({
+        message: "You must fill in a name, description and Image url"
+      });
+    } else if (!req.body.startDate || !req.body.endDate) {
+      res.status(400).send({
+        message: "You must fill in a start and end Date"
+      });
+    } else {
+      const postEvent = await Event.create(req.body);
+      res.send(postEvent);
+    }
   } catch (error) {
     next(error);
   }

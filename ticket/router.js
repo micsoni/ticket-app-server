@@ -19,7 +19,7 @@ router.get("/ticket/:ticketId", async (req, res, next) => {
     ticketFound.dataValues.risk = await getTicketRisk(ticketFound);
 
     if (!ticketFound) {
-      res.status(404).send({message:"Ticket not found"});
+      res.status(404).send({ message: "Ticket not found" });
     } else {
       res.send(ticketFound);
     }
@@ -60,8 +60,14 @@ router.get("/ticket", async (req, res, next) => {
 
 router.post("/ticket", auth, async (req, res, next) => {
   try {
-    const postEvent = await Ticket.create(req.body);
-    res.send(postEvent);
+    if (!req.body.price || !req.body.description) {
+      res.status(400).send({
+        message: "You must fill in a price and a description"
+      });
+    } else {
+      const postEvent = await Ticket.create(req.body);
+      res.send(postEvent);
+    }
   } catch (error) {
     next(error);
   }
@@ -69,14 +75,20 @@ router.post("/ticket", auth, async (req, res, next) => {
 
 router.put("/ticket/:ticketId", auth, async (req, res, next) => {
   try {
-    const ticket = await Ticket.findByPk(req.params.ticketId);
-    const userAuthorized =
-      req.user.dataValues.id === ticket.userId ? true : false;
-    if (userAuthorized) {
-      const updated = await ticket.update(req.body);
-      res.send(updated);
+    if (!req.body.price || !req.body.description) {
+      res.status(400).send({
+        message: "You must fill in a price and a description"
+      });
     } else {
-      res.status(401).send({message:"User not authorized"});
+      const ticket = await Ticket.findByPk(req.params.ticketId);
+      const userAuthorized =
+        req.user.dataValues.id === ticket.userId ? true : false;
+      if (userAuthorized) {
+        const updated = await ticket.update(req.body);
+        res.send(updated);
+      } else {
+        res.status(401).send({ message: "User not authorized" });
+      }
     }
   } catch (error) {
     next(error);
@@ -87,7 +99,7 @@ router.delete("/ticket/:ticketId", auth, async (req, res, next) => {
   try {
     const number = await Ticket.destroy({ where: { id: req.params.ticketId } });
     if (number === 0) {
-      res.status(404).send({message:"No ticket found"});
+      res.status(404).send({ message: "No ticket found" });
     } else {
       res.status(202).json(number);
     }
