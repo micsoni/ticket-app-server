@@ -1,4 +1,5 @@
 const express = require("express");
+const paginate = require("express-paginate");
 const Ticket = require("../ticket/model");
 const auth = require("../auth/middleware");
 const Comment = require("../comment/model");
@@ -22,6 +23,36 @@ router.get("/ticket/:ticketId", async (req, res, next) => {
     } else {
       res.send(ticketFound);
     }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/ticket", async (req, res, next) => {
+  const limit = Math.min(req.query.limit || 9, 50);
+  const offset = req.query.offset || 0;
+  try {
+    const allTickets = await Ticket.findAndCountAll({
+      limit,
+      offset
+    });
+
+    allTickets.pageCount = Math.ceil(allTickets.count / limit);
+    allTickets.pages = paginate.getArrayPages(req)(
+      9,
+      allTickets.pageCount,
+      req.query.page
+    );
+
+    // calculate ticket risk for all tickets and put it in each ticket
+    const ticketWithRisk = allTickets.rows.map(async ticket => {
+      ticket.dataValues.risk = await getTicketRisk(ticket);
+      return ticket;
+    });
+
+    allTickets.tickets = await Promise.all(ticketWithRisk);
+
+    res.send(allTickets);
   } catch (error) {
     next(error);
   }
